@@ -1,0 +1,30 @@
+@startuml
+
+start
+
+:posix_openpt();
+:grantpt();
+:unlockpt();
+:ptsname();
+if (fork()) then (child)
+  :setsid();
+  :open();
+  :dup2();
+  :exec();
+else
+  :open();
+  repeat
+    if (select()) then (master_fd is readable)
+      :read();
+      :write(output);
+    else (STDIN is readable)
+      :read();
+      :write(master_fd);
+    endif
+  repeat while (EOF?) is (no)
+endif
+
+stop
+
+@enduml
+
